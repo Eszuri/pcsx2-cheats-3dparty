@@ -1,6 +1,8 @@
-use eframe::egui::{self, CentralPanel, Color32, RichText};
-
 use crate::game::black::black_data;
+use eframe::{
+    NativeOptions,
+    egui::{self, CentralPanel, Color32, RichText},
+};
 
 pub fn main_gui() {
     let global_style = egui::Frame::NONE
@@ -12,27 +14,28 @@ pub fn main_gui() {
         .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
         .inner_margin(24.0);
 
-    eframe::run_ui_native(
-        "PCSX2 Cheats 3dParty",
-        Default::default(),
-        move |ctx, _frame| {
-            CentralPanel::default().frame(global_style).show(ctx, |ui| {
-                ui.vertical_centered(|ui| {
-                    title_style.show(ui, |ui| {
-                        ui.label(
-                            RichText::new("PCSX2 CHEATS")
-                                .size(24.0)
-                                .color(Color32::GREEN)
-                                .strong(),
-                        );
-                    });
+    let render_glow = NativeOptions {
+        renderer: eframe::Renderer::Glow,
+        ..Default::default()
+    };
+
+    eframe::run_ui_native("PCSX2 Cheats 3dParty", render_glow, move |ctx, _frame| {
+        CentralPanel::default().frame(global_style).show(ctx, |ui| {
+            ui.vertical_centered(|ui| {
+                title_style.show(ui, |ui| {
+                    ui.label(
+                        RichText::new("PCSX2 CHEATS")
+                            .size(24.0)
+                            .color(Color32::GREEN)
+                            .strong(),
+                    );
                 });
-                ui.separator();
-                // dinamic data
-                black_data(ui);
-                // dinamic data end
             });
-        },
-    )
-    .expect("Failed to start eframe");
+            ui.separator();
+            // dinamic data
+            black_data(ui);
+            // dinamic data end
+        });
+    })
+    .expect("Failed to start Application");
 }
