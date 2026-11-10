@@ -1,9 +1,4 @@
-use std::{sync::atomic::Ordering, thread::spawn};
-
-use crate::{
-    game::black::black_data,
-    ipc::check_pcsx2_process::{BOOL_PROCCES_PINE, cek},
-};
+use crate::{game::black::black_data, ipc::check_pcsx2_process::check_pcsx2_process};
 use eframe::{
     NativeOptions,
     egui::{self, CentralPanel, Color32, RichText},
@@ -24,12 +19,8 @@ pub fn main_gui() {
         ..Default::default()
     };
 
-    spawn(cek);
-
     eframe::run_ui_native("PCSX2 Cheats 3dParty", render_glow, move |ctx, _frame| {
         CentralPanel::default().frame(global_style).show(ctx, |ui| {
-            // code for focused window
-
             ui.vertical_centered(|ui| {
                 title_style.show(ui, |ui| {
                     ui.label(
@@ -42,11 +33,12 @@ pub fn main_gui() {
             });
             ui.separator();
             // dinamic data
-            if BOOL_PROCCES_PINE.load(Ordering::Relaxed) {
+            if check_pcsx2_process() {
                 black_data(ui);
             }
 
             // dinamic data end
+            ui.ctx().request_repaint();
         });
     })
     .expect("Failed to start Application");

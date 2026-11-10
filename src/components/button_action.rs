@@ -21,11 +21,11 @@ pub fn switch_freeze(ui: &mut Ui, label: &str) -> bool {
     is_active
 }
 
-pub fn apply_cheat(ui: &mut Ui, address: u32, value: u32, text: &str) {
+pub fn apply_cheat(ui: &mut Ui, address: u32, value: u32, freeze: bool, text: &str) {
     if ui
         .add(Button::new(RichText::new(text).size(16.0)))
         .clicked()
     {
-        rewrite_value(address, value);
+        rewrite_value(address, value, freeze);
     }
 }

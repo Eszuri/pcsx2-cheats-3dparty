@@ -10,7 +10,7 @@ pub fn black_data(ui: &mut Ui) {
         ui.label(base_style("Address Health Player"));
         ui.horizontal(|ui| {
             switch_freeze(ui, "Frezze");
-            apply_cheat(ui, 0x005A8DA8, 1144750080, "Apply Cheat");
+            apply_cheat(ui, 0x005A8DA8, 1144750080, true, "Apply Cheat");
         });
     });
 }
