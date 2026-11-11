@@ -3,7 +3,7 @@ use std::{
     net::TcpStream,
     sync::{
         Mutex,
-        atomic::{AtomicBool, AtomicU32, Ordering},
+        atomic::{AtomicBool, Ordering},
     },
     thread::{sleep, spawn},
     time::Duration,
@@ -66,24 +66,31 @@ pub fn rewrite_value(address: u32, value: u32) {
     }
 }
 
-pub fn rewrite_value_freeze(address: u32, value: u32) {
-    static TARGET_ADDRESS: AtomicU32 = AtomicU32::new(0);
-    static TARGET_VALUE: AtomicU32 = AtomicU32::new(0);
+pub fn rewrite_value_freeze(address: u32, value: u32, active: bool) {
+    static LIST_FREEZE: Mutex<Vec<(u32, u32)>> = Mutex::new(Vec::new());
     static IS_RUNNING: AtomicBool = AtomicBool::new(false);
 
-    TARGET_ADDRESS.store(address, Ordering::Relaxed);
-    TARGET_VALUE.store(value, Ordering::Relaxed);
+    {
+        let mut list = LIST_FREEZE.lock().unwrap();
+        if active {
+            if !list.iter().any(|(a, _)| *a == address) {
+                list.push((address, value));
+            }
+        } else {
+            list.retain(|(a, _)| *a != address);
+        }
+    }
 
     if !IS_RUNNING.load(Ordering::Relaxed) {
         IS_RUNNING.store(true, Ordering::Relaxed);
 
         spawn(|| {
             loop {
-                rewrite_value(
-                    TARGET_ADDRESS.load(Ordering::Relaxed),
-                    TARGET_VALUE.load(Ordering::Relaxed),
-                );
-                sleep(Duration::from_micros(100));
+                let list_active = LIST_FREEZE.lock().unwrap().clone();
+                for (addr, val) in list_active {
+                    rewrite_value(addr, val);
+                }
+                sleep(Duration::from_micros(50));
             }
         });
     }

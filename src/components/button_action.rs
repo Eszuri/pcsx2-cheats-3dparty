@@ -6,9 +6,10 @@ pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> 
     let id = ui.next_auto_id();
     let mut is_active = ui.data_mut(|d| *d.get_temp_mut_or_default(id));
     let bg = if is_active {
-        rewrite_value_freeze(address, value);
+        rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(34, 127, 94)
     } else {
+        rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(75, 85, 99)
     };
     let btn = Button::new(
