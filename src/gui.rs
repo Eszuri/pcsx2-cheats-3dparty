@@ -1,4 +1,7 @@
-use crate::{game::black::black_data, ipc::check_pcsx2_process::check_pcsx2_process};
+use crate::{
+    game::black::black_data,
+    ipc::{check_pcsx2_process::check_pcsx2_process, connect_pine::check_games_is_running},
+};
 use eframe::{
     NativeOptions,
     egui::{self, CentralPanel, Color32, RichText},
@@ -21,6 +24,7 @@ pub fn main_gui() {
 
     eframe::run_ui_native("PCSX2 Cheats 3dParty", render_glow, move |ctx, _frame| {
         CentralPanel::default().frame(global_style).show(ctx, |ui| {
+            let (games_is_running, region) = check_games_is_running();
             ui.vertical_centered(|ui| {
                 title_style.show(ui, |ui| {
                     ui.label(
@@ -34,7 +38,11 @@ pub fn main_gui() {
             ui.separator();
             // dinamic data
             if check_pcsx2_process() {
-                black_data(ui);
+                if games_is_running {
+                    if region == "SLUS-21376" {
+                        black_data(ui);
+                    }
+                }
             }
 
             // dinamic data end
