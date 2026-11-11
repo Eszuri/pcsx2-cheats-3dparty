@@ -16,8 +16,7 @@ pub fn black_data(ui: &mut Ui) {
             apply_cheat(ui, 0x005A8DA8, 1144750080, "Apply Cheat\n(one - time)");
         });
         ui.add_space(5.0);
-        ui.label(format!("value: {}", reading_value(0x005A8DA8, true)));
-        ui.label(format!("value: {}", reading_value(0x005A8DA8, false)));
-        ui.label(format!("value: {}", reading_value(0x0015515C, true)));
+        ui.label(format!("4 Bytes: {}", reading_value(0x005A8DA8, false)));
+        ui.label(format!("Float: {}", reading_value(0x005A8DA8, true)));
     });
 }
