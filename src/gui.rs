@@ -1,5 +1,5 @@
 use crate::{
-    game::black::black_data,
+    game::{black::black_data, data_games::DATA_GAMES},
     ipc::{check_pcsx2_process::check_pcsx2_process, connect_pine::check_games_is_running},
 };
 use eframe::{
@@ -24,7 +24,7 @@ pub fn main_gui() {
 
     eframe::run_ui_native("PCSX2 Cheats 3dParty", render_glow, move |ctx, _frame| {
         CentralPanel::default().frame(global_style).show(ctx, |ui| {
-            let (games_is_running, region) = check_games_is_running();
+            let (games_is_running, serial) = check_games_is_running();
             ui.vertical_centered(|ui| {
                 title_style.show(ui, |ui| {
                     ui.label(
@@ -33,13 +33,21 @@ pub fn main_gui() {
                             .color(Color32::GREEN)
                             .strong(),
                     );
+                    if let Some(x) = DATA_GAMES.iter().find(|y| y.serial == serial) {
+                        ui.label(format!(
+                            "{} | {} | {} | {}",
+                            x.title, x.serial, x.region, x.crc
+                        ));
+                    } else {
+                        ui.label("No game detected yet");
+                    }
                 });
             });
             ui.separator();
             // dinamic data
             if check_pcsx2_process() {
                 if games_is_running {
-                    if region == "SLUS-21376" {
+                    if serial == "SLUS-21376" {
                         black_data(ui);
                     }
                 }
