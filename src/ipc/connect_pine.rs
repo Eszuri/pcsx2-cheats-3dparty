@@ -1,31 +1,30 @@
+use pine_ipc::{PINE, PINEBatch, PINECommand, PINEResponse};
 use std::{
     net::TcpStream,
     sync::{
         Mutex,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU32, Ordering},
     },
-    thread::sleep,
+    thread::{sleep, spawn},
     time::Duration,
 };
 
-use pine_ipc::{PINE, PINEBatch, PINECommand, PINEResponse};
-
 pub const TARGET_APP: &str = "pcsx2";
 pub const PORT_PINE: u16 = 28011;
-static PINE_CONN: Mutex<Option<PINE<TcpStream>>> = Mutex::new(None);
+static PINE_CONNECTION: Mutex<Option<PINE<TcpStream>>> = Mutex::new(None);
 
 pub fn check_games_is_running() -> (bool, String) {
     static GAME_ID: Mutex<String> = Mutex::new(String::new());
     static IS_RUNNING: AtomicBool = AtomicBool::new(false);
     if !IS_RUNNING.load(Ordering::Relaxed) {
         IS_RUNNING.store(true, Ordering::Relaxed);
-        std::thread::spawn(|| {
+        spawn(|| {
             let mut batch = PINEBatch::new();
             batch.add(PINECommand::MsgID);
             loop {
                 let mut new_id = String::new();
 
-                if let Ok(mut conn) = PINE_CONN.lock() {
+                if let Ok(mut conn) = PINE_CONNECTION.lock() {
                     if conn.is_none() {
                         *conn = PINE::connect(TARGET_APP, PORT_PINE, true).ok();
                     }
@@ -41,7 +40,7 @@ pub fn check_games_is_running() -> (bool, String) {
                 }
 
                 *GAME_ID.lock().unwrap() = new_id;
-                sleep(Duration::from_millis(200));
+                sleep(Duration::from_millis(100));
             }
         });
     }
@@ -49,12 +48,8 @@ pub fn check_games_is_running() -> (bool, String) {
     return (!id.is_empty(), id);
 }
 
-pub fn rewrite_value(address: u32, value: u32, freeze: bool) {
-    static CHECK_REWRITE: AtomicBool = AtomicBool::new(false);
-    if !freeze && CHECK_REWRITE.load(Ordering::Relaxed) {
-        return;
-    }
-    if let Ok(mut conn) = PINE_CONN.lock() {
+pub fn rewrite_value(address: u32, value: u32) {
+    if let Ok(mut conn) = PINE_CONNECTION.lock() {
         if conn.is_none() {
             *conn = PINE::connect(TARGET_APP, PORT_PINE, true).ok();
         }
@@ -66,9 +61,30 @@ pub fn rewrite_value(address: u32, value: u32, freeze: bool) {
             });
             if p.send(&mut batch).is_err() {
                 *conn = None;
-            } else if !freeze {
-                CHECK_REWRITE.store(true, Ordering::Relaxed);
             }
         }
+    }
+}
+
+pub fn rewrite_value_freeze(address: u32, value: u32) {
+    static TARGET_ADDRESS: AtomicU32 = AtomicU32::new(0);
+    static TARGET_VALUE: AtomicU32 = AtomicU32::new(0);
+    static IS_RUNNING: AtomicBool = AtomicBool::new(false);
+
+    TARGET_ADDRESS.store(address, Ordering::Relaxed);
+    TARGET_VALUE.store(value, Ordering::Relaxed);
+
+    if !IS_RUNNING.load(Ordering::Relaxed) {
+        IS_RUNNING.store(true, Ordering::Relaxed);
+
+        spawn(|| {
+            loop {
+                rewrite_value(
+                    TARGET_ADDRESS.load(Ordering::Relaxed),
+                    TARGET_VALUE.load(Ordering::Relaxed),
+                );
+                sleep(Duration::from_micros(100));
+            }
+        });
     }
 }
