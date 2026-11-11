@@ -88,3 +88,24 @@ pub fn rewrite_value_freeze(address: u32, value: u32) {
         });
     }
 }
+
+pub fn reading_value(address: u32, is_float: bool) -> String {
+    if let Ok(mut conn) = PINE_CONNECTION.lock() {
+        if let Some(p) = &mut *conn {
+            let mut batch = PINEBatch::new();
+            batch.add(PINECommand::MsgRead32 { mem: address });
+            if let Ok(res) = p.send(&mut batch) {
+                if let Some(PINEResponse::ResRead32 { val }) = res.first() {
+                    if is_float {
+                        return format!("{:.2}", f32::from_bits(*val));
+                    } else {
+                        return val.to_string();
+                    }
+                }
+            } else {
+                *conn = None;
+            }
+        }
+    }
+    return String::from("0");
+}
