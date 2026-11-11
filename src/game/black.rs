@@ -10,8 +10,8 @@ pub fn black_data(ui: &mut Ui) {
         // address Health player
         ui.label(base_style("Address Health Player"));
         ui.horizontal(|ui| {
-            apply_cheat(ui, 0x005A8DA8, 1144750080, "Apply Cheat");
-            apply_cheat_freeze(ui, 0x005A8DA8, 1144750080, "Apply Cheat Freeze");
+            apply_cheat_freeze(ui, 0x005A8DA8, 1144750080, "Apply Freeze");
+            apply_cheat(ui, 0x005A8DA8, 1144750080, "Apply Cheat\n(one - time)");
         });
     });
 }
