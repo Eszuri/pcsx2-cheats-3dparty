@@ -1,5 +1,5 @@
 use crate::{
-    components::button_action::{apply_cheat, apply_cheat_freeze},
+    components::button_action::{apply_cheat, apply_cheat_freeze, apply_cheat_freeze_all},
     ipc::connect_pine::reading_value,
     style::base_style,
 };
@@ -34,6 +34,12 @@ fn xyz(ui: &mut Ui, title: &str, address: u32, value: u32) {
 }
 
 pub fn black_data(ui: &mut Ui) {
+    if ui.button("test on all freeze").clicked() {
+        apply_cheat_freeze_all(ui, true);
+    }
+    if ui.button("test off all freeze").clicked() {
+        apply_cheat_freeze_all(ui, false);
+    }
     xyz(ui, "Address Health Player", 0x005A8DA8, 1144750080);
     xyz(ui, "Infinite grenade", 0x001551B0, 0000000000);
 }

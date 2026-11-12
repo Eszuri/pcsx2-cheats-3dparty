@@ -1,10 +1,14 @@
 use crate::ipc::connect_pine::{check_games_is_running, rewrite_value, rewrite_value_freeze};
 use eframe::egui::{Button, Color32, CursorIcon, Id, RichText, Ui};
+use std::sync::Mutex;
+
+static LIST_BUTTON_ACTION: Mutex<Vec<Id>> = Mutex::new(Vec::new());
 
 pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> bool {
     let (_, serial) = check_games_is_running();
     let id: Id = ui.make_persistent_id((address, serial));
     let mut is_active = ui.data_mut(|d| *d.get_persisted_mut_or_default(id));
+
     let bg = if is_active {
         rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(34, 127, 94)
@@ -19,6 +23,12 @@ pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> 
     )
     .fill(bg)
     .corner_radius(6.0);
+
+    if let Ok(mut list) = LIST_BUTTON_ACTION.lock() {
+        if !list.contains(&id) {
+            list.push(id);
+        }
+    }
 
     if ui
         .add_sized([150.0, 40.0], btn)
@@ -47,4 +57,13 @@ pub fn apply_cheat(ui: &mut Ui, address: u32, value: u32, text: &str) {
     if btn2.clicked() {
         rewrite_value(address, value);
     }
+}
+
+pub fn apply_cheat_freeze_all(ui: &mut Ui, aktif: bool) {
+    let list = LIST_BUTTON_ACTION.lock().unwrap().clone();
+    ui.data_mut(|d| {
+        for id in list {
+            d.insert_persisted(id, aktif);
+        }
+    });
 }
