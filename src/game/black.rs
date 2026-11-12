@@ -6,6 +6,11 @@ use crate::{
 use eframe::egui::Ui;
 
 fn xyz(ui: &mut Ui, title: &str, address: u32, value: u32) {
+    let reading_value_decimal_bytes = reading_value(address, false);
+    let reading_value_decimal_float = reading_value(address, true);
+
+    let reading_value_hexadecimal_bytes = reading_value_decimal_bytes.parse::<u32>().unwrap_or(0);
+    let reading_value_hexadecimal_float = reading_value_decimal_float.parse::<f32>().unwrap_or(0.0);
     ui.group(|ui| {
         ui.label(base_style(title));
         ui.separator();
@@ -17,8 +22,14 @@ fn xyz(ui: &mut Ui, title: &str, address: u32, value: u32) {
             })
         });
         ui.add_space(5.0);
-        ui.label(format!("4 Bytes: {}", reading_value(address, false)));
-        ui.label(format!("Float: {}", reading_value(address, true)));
+        ui.label(format!(
+            "4 Bytes: {reading_value_decimal_bytes} | {reading_value_hexadecimal_bytes:08X}"
+        ));
+        ui.label(format!(
+            "Float: {} | {:08X}",
+            reading_value_decimal_float,
+            reading_value_hexadecimal_float.to_bits()
+        ));
     });
 }
 
