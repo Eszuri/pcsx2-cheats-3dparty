@@ -19,7 +19,7 @@ fn xyz(ui: &mut Ui, title: &str, address: u32, value: u32) {
             let freeze_condition = apply_cheat_freeze(ui, address, value, "Apply Freeze");
             ui.add_enabled_ui(!freeze_condition, |ui| {
                 apply_cheat(ui, address, value, "Apply Cheat\n(one - time)");
-            })
+            });
         });
         ui.add_space(5.0);
         ui.label(format!(
