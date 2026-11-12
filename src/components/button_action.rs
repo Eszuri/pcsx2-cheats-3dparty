@@ -3,7 +3,7 @@ use eframe::egui::{Button, Color32, CursorIcon, Id, RichText, Ui};
 
 pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> bool {
     let id: Id = ui.make_persistent_id(address);
-    let mut is_active = ui.data_mut(|d| *d.get_temp_mut_or_default(id));
+    let mut is_active = ui.data_mut(|d| *d.get_persisted_mut_or_default(id));
     let bg = if is_active {
         rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(34, 127, 94)
@@ -25,7 +25,7 @@ pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> 
         .clicked()
     {
         is_active = !is_active;
-        ui.data_mut(|d| d.insert_temp(id, is_active));
+        ui.data_mut(|d| d.insert_persisted(id, is_active));
     }
     return is_active;
 }
