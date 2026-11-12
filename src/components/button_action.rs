@@ -35,11 +35,16 @@ pub fn apply_cheat(ui: &mut Ui, address: u32, value: u32, text: &str) {
     let btn = Button::new(RichText::new(text).color(Color32::WHITE).size(15.0))
         .corner_radius(6.0)
         .fill(Color32::from_rgb(75, 85, 99));
-    if ui
+
+    let btn2 = ui
         .add_sized([150.0, 40.0], btn)
-        .on_hover_cursor(CursorIcon::PointingHand)
-        .clicked()
-    {
+        .on_hover_cursor(CursorIcon::PointingHand);
+
+    if !ui.is_enabled() && btn2.contains_pointer() {
+        ui.ctx().set_cursor_icon(CursorIcon::NotAllowed);
+    }
+
+    if btn2.clicked() {
         rewrite_value(address, value);
     }
 }

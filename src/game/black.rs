@@ -11,8 +11,10 @@ fn xyz(ui: &mut Ui, title: &str, address: u32, value: u32) {
         ui.separator();
         ui.add_space(10.0);
         ui.horizontal(|ui| {
-            apply_cheat_freeze(ui, address, value, "Apply Freeze");
-            apply_cheat(ui, address, value, "Apply Cheat\n(one - time)");
+            let freeze_condition = apply_cheat_freeze(ui, address, value, "Apply Freeze");
+            ui.add_enabled_ui(!freeze_condition, |ui| {
+                apply_cheat(ui, address, value, "Apply Cheat\n(one - time)");
+            })
         });
         ui.add_space(5.0);
         ui.label(format!("4 Bytes: {}", reading_value(address, false)));
