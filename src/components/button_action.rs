@@ -1,6 +1,5 @@
-use eframe::egui::{Button, Color32, CursorIcon, RichText, Ui};
-
 use crate::ipc::connect_pine::{rewrite_value, rewrite_value_freeze};
+use eframe::egui::{Button, Color32, CursorIcon, RichText, Ui};
 
 pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> bool {
     let id = ui.next_auto_id();
