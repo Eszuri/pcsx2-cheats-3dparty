@@ -87,9 +87,27 @@ pub fn rewrite_value_freeze(address: u32, value: u32, active: bool) {
         spawn(|| {
             loop {
                 let list_active = LIST_FREEZE.lock().unwrap().clone();
-                for (addr, val) in list_active {
-                    rewrite_value(addr, val);
+
+                if !list_active.is_empty() {
+                    if let Ok(mut conn) = PINE_CONNECTION.lock() {
+                        if conn.is_none() {
+                            *conn = PINE::connect(TARGET_APP, PORT_PINE, true).ok();
+                        }
+                        if let Some(p) = &mut *conn {
+                            let mut batch = PINEBatch::new();
+                            for (addr, val) in list_active {
+                                batch.add(PINECommand::MsgWrite32 {
+                                    mem: addr,
+                                    val: val,
+                                });
+                            }
+                            if p.send(&mut batch).is_err() {
+                                *conn = None;
+                            }
+                        }
+                    }
                 }
+
                 sleep(Duration::from_micros(50));
             }
         });
