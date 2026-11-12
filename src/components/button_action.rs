@@ -1,8 +1,9 @@
-use crate::ipc::connect_pine::{rewrite_value, rewrite_value_freeze};
+use crate::ipc::connect_pine::{check_games_is_running, rewrite_value, rewrite_value_freeze};
 use eframe::egui::{Button, Color32, CursorIcon, Id, RichText, Ui};
 
 pub fn apply_cheat_freeze(ui: &mut Ui, address: u32, value: u32, text: &str) -> bool {
-    let id: Id = ui.make_persistent_id(address);
+    let (_, serial) = check_games_is_running();
+    let id: Id = ui.make_persistent_id((address, serial));
     let mut is_active = ui.data_mut(|d| *d.get_persisted_mut_or_default(id));
     let bg = if is_active {
         rewrite_value_freeze(address, value, is_active);
