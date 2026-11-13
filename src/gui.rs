@@ -4,7 +4,7 @@ use crate::{
 };
 use eframe::{
     NativeOptions,
-    egui::{self, CentralPanel, Color32, RichText},
+    egui::{self, CentralPanel, Color32, RichText, viewport},
 };
 
 pub fn main_gui() {
@@ -18,6 +18,12 @@ pub fn main_gui() {
         .inner_margin(24.0);
 
     let render_glow = NativeOptions {
+        persist_window: true,
+        viewport: viewport::ViewportBuilder::default()
+            .with_inner_size([460.0, 600.0])
+            .with_min_inner_size([360.0, 600.0])
+            .with_max_inner_size([760.0, 600.0])
+            .with_maximize_button(false),
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
