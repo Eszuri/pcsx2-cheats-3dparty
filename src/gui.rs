@@ -4,7 +4,7 @@ use crate::{
 };
 use eframe::{
     NativeOptions,
-    egui::{self, CentralPanel, Color32, RichText, viewport},
+    egui::{self, CentralPanel, Color32, CursorIcon::PointingHand, Layout, RichText, viewport},
 };
 
 pub fn main_gui() {
@@ -15,7 +15,12 @@ pub fn main_gui() {
     let title_style = egui::Frame::NONE
         .fill(egui::Color32::from_rgb(39, 39, 42))
         .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
-        .inner_margin(24.0);
+        .inner_margin(egui::Margin {
+            left: 5,
+            right: 5,
+            top: 20,
+            bottom: 5,
+        });
 
     let render_glow = NativeOptions {
         persist_window: true,
@@ -47,6 +52,22 @@ pub fn main_gui() {
                     } else {
                         ui.label("No game detected yet");
                     }
+
+                    ui.add_space(15.0);
+                    ui.with_layout(Layout::right_to_left(egui::Align::Min), |ui| {
+                        egui::Frame::NONE
+                            .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
+                            .inner_margin(6)
+                            .corner_radius(4)
+                            .show(ui, |ui| {
+                                let x = ui
+                                    .label(RichText::new("advanced menu >>"))
+                                    .on_hover_cursor(PointingHand);
+                                if x.clicked() {
+                                    println!("a")
+                                }
+                            });
+                    });
                 });
             });
             ui.separator();
