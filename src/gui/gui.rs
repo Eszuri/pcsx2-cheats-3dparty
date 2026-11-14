@@ -1,11 +1,16 @@
+use std::sync::atomic::AtomicBool;
+
 use crate::{
     game::{black::black_data, data_games::DATA_GAMES},
+    gui::advanced_mode,
     ipc::{check_pcsx2_process::check_pcsx2_process, connect_pine::check_games_is_running},
 };
 use eframe::{
     NativeOptions,
     egui::{self, CentralPanel, Color32, CursorIcon::PointingHand, Layout, RichText, viewport},
 };
+
+pub static ADVANCED_MODE_IS_RUNNING: AtomicBool = AtomicBool::new(false);
 
 pub fn main_gui() {
     let global_style = egui::Frame::NONE
@@ -55,18 +60,21 @@ pub fn main_gui() {
 
                     ui.add_space(15.0);
                     ui.with_layout(Layout::right_to_left(egui::Align::Min), |ui| {
-                        egui::Frame::NONE
-                            .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
-                            .inner_margin(6)
-                            .corner_radius(4)
-                            .show(ui, |ui| {
-                                let x = ui
-                                    .label(RichText::new("advanced menu >>"))
-                                    .on_hover_cursor(PointingHand);
-                                if x.clicked() {
-                                    println!("a")
-                                }
-                            });
+                        ui.spacing_mut().button_padding = egui::vec2(18.0, 12.0);
+                        ui.visuals_mut().widgets.inactive.bg_stroke =
+                            egui::Stroke::new(1.0, egui::Color32::GRAY);
+                        let x = ui
+                            .button(RichText::new("advanced menu >>"))
+                            .on_hover_and_drag_cursor(PointingHand);
+
+                        if x.clicked() {
+                            ADVANCED_MODE_IS_RUNNING
+                                .store(true, std::sync::atomic::Ordering::Relaxed);
+                            ui.ctx().send_viewport_cmd_to(
+                                egui::ViewportId::from_hash_of("advanced_window"),
+                                egui::ViewportCommand::Focus,
+                            );
+                        }
                     });
                 });
             });
@@ -83,6 +91,7 @@ pub fn main_gui() {
             // dinamic data end
             ui.ctx().request_repaint();
         });
+        advanced_mode::advanced_mode(ctx);
     })
     .expect("Failed to start Application");
 }
