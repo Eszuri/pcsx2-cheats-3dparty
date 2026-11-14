@@ -71,7 +71,7 @@ pub fn main_gui() {
                             ADVANCED_MODE_IS_RUNNING
                                 .store(true, std::sync::atomic::Ordering::Relaxed);
                             ui.ctx().send_viewport_cmd_to(
-                                egui::ViewportId::from_hash_of("advanced_window"),
+                                egui::ViewportId::from_hash_of("advanced_menu_window"),
                                 egui::ViewportCommand::Focus,
                             );
                         }
