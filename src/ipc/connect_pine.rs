@@ -12,6 +12,7 @@ use std::{
 pub const TARGET_APP: &str = "pcsx2";
 pub const PORT_PINE: u16 = 28011;
 static PINE_CONNECTION: Mutex<Option<PINE<TcpStream>>> = Mutex::new(None);
+static LIST_FREEZE: Mutex<Vec<(u32, u32)>> = Mutex::new(Vec::new());
 
 pub fn check_games_is_running() -> (bool, String) {
     static GAME_ID: Mutex<String> = Mutex::new(String::new());
@@ -67,7 +68,6 @@ pub fn rewrite_value(address: u32, value: u32) {
 }
 
 pub fn rewrite_value_freeze(address: u32, value: u32, active: bool) {
-    static LIST_FREEZE: Mutex<Vec<(u32, u32)>> = Mutex::new(Vec::new());
     static IS_RUNNING: AtomicBool = AtomicBool::new(false);
 
     {
@@ -133,4 +133,12 @@ pub fn reading_value(address: u32, is_float: bool) -> String {
         }
     }
     return String::from("0");
+}
+
+pub fn clear_all_freeze() {
+    if let Ok(mut list) = LIST_FREEZE.lock() {
+        if !list.is_empty() {
+            list.clear();
+        }
+    }
 }

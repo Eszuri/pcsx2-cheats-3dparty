@@ -4,7 +4,10 @@ use crate::{
         advanced_mode,
         tray_icon::{handle_tray, init_tray},
     },
-    ipc::{check_pcsx2_process::check_pcsx2_process, connect_pine::check_games_is_running},
+    ipc::{
+        check_pcsx2_process::check_pcsx2_process,
+        connect_pine::{check_games_is_running, clear_all_freeze},
+    },
 };
 use eframe::{
     NativeOptions,
@@ -110,6 +113,8 @@ pub fn main_gui() {
                     if serial == "SLUS-21376" {
                         black_data(ui);
                     }
+                } else {
+                    clear_all_freeze();
                 }
             }
 
