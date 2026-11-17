@@ -34,6 +34,16 @@ pub const DATA_GAMES: &[Game] = &[
                 address: 0x0015515C,
                 value: 6690849,
             },
+            EE {
+                title: "Complete All Level",
+                address: 0x0048EFAC,
+                value: 2097160,
+            },
+            EE {
+                title: "Unlock All Level",
+                address: 0x048EFC4,
+                value: 2097160,
+            },
         ],
     },
     Game {
