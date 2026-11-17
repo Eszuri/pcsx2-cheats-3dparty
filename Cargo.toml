@@ -9,3 +9,4 @@ eframe = { version = "0.37.0", default-features = false, features = ["glow", "de
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
 pine-ipc = "1.0.2"
 sysinfo = "0.40.1"
+tray-icon = "0.26.1"

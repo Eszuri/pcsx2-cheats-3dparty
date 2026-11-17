@@ -1,13 +1,19 @@
 use crate::{
     game::{black::black_data, data_games::DATA_GAMES},
-    gui::advanced_mode,
+    gui::{
+        advanced_mode,
+        tray_icon::{handle_tray, init_tray},
+    },
     ipc::{check_pcsx2_process::check_pcsx2_process, connect_pine::check_games_is_running},
 };
 use eframe::{
     NativeOptions,
     egui::{self, CentralPanel, Color32, CursorIcon::PointingHand, Layout, RichText, viewport},
 };
-use std::sync::{Arc, atomic::AtomicBool};
+use std::{
+    env::args,
+    sync::{Arc, atomic::AtomicBool},
+};
 
 pub static ADVANCED_MODE_IS_RUNNING: AtomicBool = AtomicBool::new(false);
 
@@ -40,6 +46,9 @@ pub fn main_gui() {
             bottom: 5,
         });
 
+    let start_in_tray = args().any(|x| x == "--tray");
+    let _tray = init_tray(&load_icon(), start_in_tray);
+
     let render_glow = NativeOptions {
         persist_window: true,
         viewport: viewport::ViewportBuilder::default()
@@ -47,12 +56,14 @@ pub fn main_gui() {
             .with_min_inner_size([360.0, 600.0])
             .with_max_inner_size([760.0, 600.0])
             .with_maximize_button(false)
-            .with_icon(load_icon()),
+            .with_icon(load_icon())
+            .with_visible(!start_in_tray),
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
 
     eframe::run_ui_native("PCSX2 Cheats 3dParty", render_glow, move |ctx, _frame| {
+        handle_tray(ctx, start_in_tray);
         CentralPanel::default().frame(global_style).show(ctx, |ui| {
             let (games_is_running, serial) = check_games_is_running();
             ui.vertical_centered(|ui| {
