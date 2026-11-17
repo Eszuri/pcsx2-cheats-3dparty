@@ -11,7 +11,7 @@ use std::sync::{Arc, atomic::AtomicBool};
 
 pub static ADVANCED_MODE_IS_RUNNING: AtomicBool = AtomicBool::new(false);
 
-fn load_icon() -> Arc<egui::IconData> {
+pub fn load_icon() -> Arc<egui::IconData> {
     let icon_bytes = include_bytes!("../../assets/icon.png");
     let image = image::load_from_memory(icon_bytes)
         .expect("Failed to open icon path")

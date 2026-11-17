@@ -1,4 +1,7 @@
-use crate::gui::{advanced_mode_setting, gui::ADVANCED_MODE_IS_RUNNING};
+use crate::gui::{
+    advanced_mode_setting,
+    gui::{ADVANCED_MODE_IS_RUNNING, load_icon},
+};
 use eframe::egui::{
     self, Button, CentralPanel, CursorIcon::PointingHand, Ui, ViewportBuilder, ViewportId,
 };
@@ -12,7 +15,8 @@ pub fn advanced_mode(ui: &mut Ui) {
             ViewportId::from_hash_of("advanced_menu_window"),
             ViewportBuilder::default()
                 .with_title("Advanced Menu")
-                .with_inner_size([360.0, 260.0]),
+                .with_inner_size([360.0, 260.0])
+                .with_icon(load_icon()),
             |ui, _class| {
                 CentralPanel::default().show(ui, |ui| {
                     let tab = MENU_ACTIVE.load(std::sync::atomic::Ordering::Relaxed);
