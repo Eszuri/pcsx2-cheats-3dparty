@@ -21,14 +21,12 @@ pub fn apply_cheat_freeze(
     serial_game: &str,
     text: &str,
 ) -> bool {
-    let (_, serial) = check_games_is_running();
-    let id: Id = ui.make_persistent_id((address, serial));
+    let id: Id = ui.make_persistent_id((address, serial_game));
     let mut is_active = ui.data_mut(|d| *d.get_persisted_mut_or_default(id));
     let bg = if is_active {
         rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(34, 127, 94)
     } else {
-        rewrite_value_freeze(address, value, is_active);
         Color32::from_rgb(75, 85, 99)
     };
     let btn = Button::new(
