@@ -1,5 +1,3 @@
-use std::sync::atomic::AtomicBool;
-
 use crate::{
     game::{black::black_data, data_games::DATA_GAMES},
     gui::advanced_mode,
@@ -9,8 +7,23 @@ use eframe::{
     NativeOptions,
     egui::{self, CentralPanel, Color32, CursorIcon::PointingHand, Layout, RichText, viewport},
 };
+use std::sync::{Arc, atomic::AtomicBool};
 
 pub static ADVANCED_MODE_IS_RUNNING: AtomicBool = AtomicBool::new(false);
+
+fn load_icon() -> Arc<egui::IconData> {
+    let icon_bytes = include_bytes!("../../assets/icon.png");
+    let image = image::load_from_memory(icon_bytes)
+        .expect("Failed to open icon path")
+        .into_rgba8();
+    let (width, height) = image.dimensions();
+
+    Arc::new(egui::IconData {
+        rgba: image.into_raw(),
+        width,
+        height,
+    })
+}
 
 pub fn main_gui() {
     let global_style = egui::Frame::NONE
@@ -33,7 +46,8 @@ pub fn main_gui() {
             .with_inner_size([460.0, 600.0])
             .with_min_inner_size([360.0, 600.0])
             .with_max_inner_size([760.0, 600.0])
-            .with_maximize_button(false),
+            .with_maximize_button(false)
+            .with_icon(load_icon()),
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
